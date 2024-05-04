@@ -7,8 +7,9 @@
 //     Module Name: alu
 //     Description: 16-bit RISC-based CPU alu (MIPS)
 //
-// Revision: 1.0 - Initial Build
+// Revision: 1.2
 // 1.1 - Adjusted slt to make signed comparisons
+// 1.2 - Made an extra condition for default just in case
 // see https://github.com/Caskman/MIPS-Processor-in-Verilog/blob/master/ALU32Bit.v
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef ALU
@@ -53,6 +54,7 @@ module alu
 					end
 					out = temp[n-1:0];
 				end
+			default: out = 'bz;
 		endcase
 
 		if (out == 16'b0000000000000000) begin
