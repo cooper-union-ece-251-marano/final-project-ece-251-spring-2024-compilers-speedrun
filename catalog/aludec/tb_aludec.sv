@@ -7,7 +7,8 @@
 //     Module Name: tb_aludec
 //     Description: Test bench for simple behavorial ALU decoder
 //
-// Revision: 1.0 - Initial Build
+// Revision: 1.1
+// 1.1 - $dumpfile was accidentally dumping the module file itself (oops)
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TB_ALUDEC
@@ -22,7 +23,7 @@ module tb_aludec;
     logic [2:0] ALU;
 
     initial begin
-	$dumpfile("aludec.sv");
+	$dumpfile("aludec.vcd");
 	$dumpvars(0, uut);
 	$monitor("op = %b, alu = %b", OP, ALU);
     end
