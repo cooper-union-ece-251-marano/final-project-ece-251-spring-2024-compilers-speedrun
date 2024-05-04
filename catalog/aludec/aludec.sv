@@ -7,7 +7,8 @@
 //     Module Name: aludec
 //     Description: 16-bit RISC ALU decoder
 //
-// Revision: 1.0 - Initial Build
+// Revision: 1.1
+// 1.1 - Fixed typos on case conditions
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef ALUDEC
@@ -32,12 +33,12 @@ module aludec
 			case (opcode)
 				4'b0000: aluop = 3'b111;
 				4'b0001: aluop = 3'b101;
-				4'b0000: aluop = 3'b101;
-				4'b0001: aluop = 3'b101;
-				4'b0000: aluop = 3'b100;
-				4'b0001: aluop = 3'b100;
-				4'b0000: aluop = 3'b101;
-				4'b0001: aluop = 3'b101;
+				4'b0010: aluop = 3'b101;
+				4'b0011: aluop = 3'b101;
+				4'b0100: aluop = 3'b100;
+				4'b0101: aluop = 3'b100;
+				4'b0110: aluop = 3'b101;
+				4'b0111: aluop = 3'b101;
 			endcase
 		end
 	end
