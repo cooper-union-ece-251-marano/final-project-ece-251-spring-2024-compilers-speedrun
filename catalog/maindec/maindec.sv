@@ -7,7 +7,8 @@
 //     Module Name: maindec
 //     Description: 32-bit RISC-based CPU main decoder (MIPS)
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Fitted to match new control signals
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef MAINDEC
@@ -16,35 +17,48 @@
 `timescale 1ns/100ps
 
 module maindec
-    #(parameter n = 32)(
+    (
     //
     // ---------------- PORT DEFINITIONS ----------------
     //
-    input  logic [5:0] op,
-    output logic       memtoreg, memwrite,
-    output logic       branch, alusrc,
-    output logic       regdst, regwrite,
-    output logic       jump,
-    output logic [1:0] aluop
+    input  logic [3:0] op,
+    output logic       memtoreg, regwrite, memwrite,
+    output logic       branch, jump, alusrc,
+    output logic       regsrc, shortlong
 );
     //
     // ---------------- MODULE DESIGN IMPLEMENTATION ----------------
     //
-    logic [8:0] controls; // 9-bit control vector
+    logic [7:0] controls; // 8-bit control vector
 
-    // controls has 9 logical signals
-    assign {regwrite, regdst, alusrc, branch, memwrite,
-            memtoreg, jump, aluop} = controls;
+    // controls has 8 logical signals
+    assign {memtoreg, regwrite, memwrite, branch, jump, alusrc,
+            regsrc, shortlong} = controls;
 
     always @* begin
         case(op)
-            6'b000000: controls <= 9'b110000010; // RTYPE
-            6'b100011: controls <= 9'b101001000; // LW
-            6'b101011: controls <= 9'b001010000; // SW
-            6'b000100: controls <= 9'b000100001; // BEQ
-            6'b001000: controls <= 9'b101000000; // ADDI
-            6'b000010: controls <= 9'b000000100; // J
-            default:   controls <= 9'bxxxxxxxxx; // illegal operation
+            4'b0000: controls <= 8'b01000100; // SHFT
+            4'b0001: controls <= 8'b01000100; // ADDI
+            4'b0010: controls <= 8'b10100100; // SW
+            4'b0011: controls <= 8'b11000100; // LW
+
+            4'b0100: controls <= 8'b00010001; // BEQ
+            4'b0101: controls <= 8'b00010001; // BNEQ
+            4'b0110: controls <= 8'b00001101; // JUMP
+	    4'b0111: controls <= 8'b00001101; // 0111 Not assigned, but will just make it a jump operation for convenience sake
+ 
+ 	    //R-TYPES
+            4'b1000: controls <= 8'b01000010; // AND 
+            4'b1001: controls <= 8'b01000010; // OR
+            4'b1010: controls <= 8'b01000010; // NOT 
+            4'b1011: controls <= 8'b01000010; // XOR
+
+            4'b1100: controls <= 8'b01000010; // SUB 
+            4'b1101: controls <= 8'b01000010; // ADD
+            4'b1110: controls <= 8'b01000010; // SLT 
+            4'b1111: controls <= 8'b01000100; // Not assigned (but is effectively just shft)
+
+            default: controls <= 8'bxxxxxxxx; // illegal operation
         endcase
     end
 
