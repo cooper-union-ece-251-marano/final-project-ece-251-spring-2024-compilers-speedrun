@@ -23,9 +23,9 @@ module regfile
     // ---------------- PORT DEFINITIONS ----------------
     //
     input  logic        clk, 
-    input  logic        we3, 
-    input  logic [(r-1):0]  ra1, ra2, wa3, 
-    input  logic [(n-1):0] wd3, 
+    input  logic        we, 
+    input  logic [(r-1):0]  ra1, ra2, wa, 
+    input  logic [(n-1):0] wd, 
     output logic [(n-1):0] rd1, rd2
     );
     //
@@ -41,7 +41,9 @@ module regfile
     // on falling edge of clk
 
     always @(posedge clk)
-        if (we3) rf[wa3] <= wd3;	
+        if (we) begin
+		rf[wa] <= wd;
+	end
 
     assign rd1 = (ra1 != 0) ? rf[ra1] : 0;
     assign rd2 = (ra2 != 0) ? rf[ra2] : 0;

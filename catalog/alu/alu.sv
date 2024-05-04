@@ -8,6 +8,7 @@
 //     Description: 16-bit RISC-based CPU alu (MIPS)
 //
 // Revision: 1.0 - Initial Build
+// 1.1 - Adjusted slt to make signed comparisons
 // see https://github.com/Caskman/MIPS-Processor-in-Verilog/blob/master/ALU32Bit.v
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef ALU
@@ -17,46 +18,44 @@
 
 module alu
     #(parameter n = 16)(
-    input logic [n-1:0] srca, input logic [n-1:0] srcb,
+    input logic signed [n-1:0] srca, input logic signed [n-1:0] srcb,
     input logic [2:0] opcode,
     output logic [n-1:0] out, output logic zero
 );
 	logic [n:0] temp;
-	logic [n-1:0] bnot;
 
 	always @(*) begin
-		case (opcode) begin
-			case 3'b000: out = srca & srcb; 
+		case (opcode)
+			3'b000: out = srca & srcb; 
 
-			case 3'b001: out = srca | srcb;
+			3'b001: out = srca | srcb;
 
-			case 3'b010: out = ~srca;
+			3'b010: out = ~srca;
 
-			case 3'b011: out = srca ^ srcb;
+			3'b011: out = srca ^ srcb;
 
-			case 3'b100: begin
-					bnot = ~b + 1;
+			3'b100: begin
+					temp = srca - srcb;
+					out = temp[n-1:0];
+				end
+
+			3'b101: begin
 					temp = srca + srcb;
 					out = temp[n-1:0];
-				     end
+				end
 
-			case 3'b101: begin
-					temp = srca + srcb;
-					out = temp[n-1:0];
-				     end
+			3'b110: out = (srca < srcb) ? 1 : 0;
 
-			case 3'b110: out = (srca < srcb) ? 1 : 0;
-
-			case 3'b111: begin
+			3'b111: begin
 					temp = srca;
 					for (int i = srcb[3:0]; i != 0; i--) begin
-						 = temp << 1;
+						temp = temp << 1;
 					end
 					out = temp[n-1:0];
-				     end
-		end
+				end
+		endcase
 
-		if (out == 0) begin
+		if (out == 16'b0000000000000000) begin
 			zero = 1;
 		end
 		else begin

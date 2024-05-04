@@ -1,13 +1,14 @@
 //////////////////////////////////////////////////////////////////////////////////
 // The Cooper Union
 // ECE 251 Spring 2024
-// Engineer: YOUR NAMES
+// Engineer: Jason Hao and Daniel Park
 // 
 //     Create Date: 2023-02-07
 //     Module Name: tb_adder
 //     Description: Test bench for simple behavorial adder
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Changed parameters and more inputs
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TB_ADDER
@@ -17,22 +18,28 @@
 `include "adder.sv"
 
 module tb_adder;
-    parameter n = 32;
+    parameter n = 16;
     logic [(n-1):0] a, b, y;
 
    initial begin
         $dumpfile("adder.vcd");
         $dumpvars(0, uut);
-        $monitor("a = 0x%0h b = 0x%0h y = 0x%0h", a, b, y);
+        $monitor("a = %b b = %b y = %b", a, b, y);
     end
 
     initial begin
-        a <= #n'hFFFFFFFF;
-        b <= #n'hFFFFFFFF;
+        a <= 16'b0000000000000000;
+        #10 b <= 16'b0101010101010101;
+
+	#10 a <= 16'b0000111101011000;
+	#10 b <= 16'b1111111111111111;
+
+	#10 a <= 16'b1110000000000101;
+	#10 b <= 16'b0000000011111111;
     end
 
     adder uut(
-        .A(a), .B(b), .Y(y)
+        .a(a), .b(b), .sum(y)
     );
 endmodule
 `endif // TB_ADDER

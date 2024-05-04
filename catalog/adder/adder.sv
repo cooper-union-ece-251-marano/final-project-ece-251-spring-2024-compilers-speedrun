@@ -16,7 +16,7 @@
 `timescale 1ns/100ps
 
 module adder
-    #(parameter n = 16(
+    #(parameter n = 16)(
 	input logic [n-1:0] a, input logic [n-1:0] b,
 	output logic [n-1:0] sum
 );
