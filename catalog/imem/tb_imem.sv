@@ -7,7 +7,8 @@
 //     Module Name: tb_imem
 //     Description: Test bench for instruction memory
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Changed some parameters, added more test inputs, and tweaked the program file
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TB_IMEM
@@ -17,7 +18,7 @@
 `include "imem.sv"
 
 module tb_imem;
-    parameter n = 32; // bit length of registers/memory
+    parameter n = 16; // bit length of registers/memory
     parameter r = 6; // we are only addressing 64=2**6 mem slots in imem
     logic [(n-1):0] readdata;
     logic [(r-1):0] imem_addr;
@@ -33,6 +34,13 @@ module tb_imem;
         #10 imem_addr <= #(r)'b000000;
         #10 imem_addr <= #(r)'b000001;
         #10 imem_addr <= #(r)'b000010;
+        #10 imem_addr <= #(r)'b000011;
+        #10 imem_addr <= #(r)'b000100;
+        #10 imem_addr <= #(r)'b000101;
+	#10 imem_addr <= #(r)'b000110;
+        #10 imem_addr <= #(r)'b000000;
+        #10 imem_addr <= #(r)'b000010;
+	#10
         $finish;
     end
 

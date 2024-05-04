@@ -7,7 +7,8 @@
 //     Module Name: tb_dmem
 //     Description: Test bench for data memory
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Changed parameters and added more inputs
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TB_DMEM
@@ -18,7 +19,7 @@
 `include "../clock/clock.sv"
 
 module tb_dmem;
-    parameter n = 32; // bit length of registers/memory
+    parameter n = 16; // bit length of registers/memory
     parameter r = 6; // we are only addressing 64=2**6 mem slots in imem
     logic [(n-1):0] readdata, writedata;
     logic [(n-1):0] dmem_addr;

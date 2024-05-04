@@ -5,9 +5,10 @@
 // 
 //     Create Date: 2023-02-07
 //     Module Name: imem
-//     Description: 32-bit RISC memory (instruction "text" segment)
+//     Description: 16-bit RISC memory (instruction "text" segment)
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Changed parameters to fit 16-bit computer
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef IMEM
@@ -17,7 +18,7 @@
 
 module imem
 // n=bit length of register; r=bit length of addr to limit memory and not crash your verilog emulator
-    #(parameter n = 32, parameter r = 6)(
+    #(parameter n = 16, parameter r = 6)(
     //
     // ---------------- PORT DEFINITIONS ----------------
     //

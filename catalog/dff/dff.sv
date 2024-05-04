@@ -7,7 +7,8 @@
 //     Module Name: dff
 //     Description: 32 bit D flip flop
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Changed parameters to fit 16-bit computer
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef DFF
@@ -16,7 +17,7 @@
 `timescale 1ns/100ps
 
 module dff
-    #(parameter n = 32)(
+    #(parameter n = 16)(
     //
     // ---------------- PORT DEFINITIONS ----------------
     //

@@ -7,7 +7,8 @@
 //     Module Name: tb_dff
 //     Description: Test bench for 32 bit D flip flop
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Changed parameters and added more displays for testing
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TB_DFF
@@ -18,7 +19,7 @@
 `include "../clock/clock.sv"
 
 module tb_dff;
-    parameter n = 32; // #bits for an operand
+    parameter n = 16; // #bits for an operand
     wire clk;
     logic enable;
     logic reset;
@@ -29,7 +30,7 @@ module tb_dff;
         $dumpfile("dff.vcd");
         $dumpvars(0, uut0, uut1);
         //$monitor("d = %b (0x%0h)(%0d) q = %b (0x%0h)(%0d) ", d,d,d,q,q,q);
-        $monitor("time=%0t \t d=%h q=%h",$realtime, d, q);
+        $monitor("time=%0t \t d=%h q=%h en=%h r=%h",$realtime, d, q, enable, reset);
     end
 
     initial begin
@@ -39,7 +40,7 @@ module tb_dff;
         #10 reset <= 1;
         #20 d <= #n'h0001;
         #10 reset <= 0;
-        #10 reset <=0;
+        #10 reset <= 0;
         #20 d <= #n'h0001;
         #100 enable <= 0;
         $finish;        
