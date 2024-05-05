@@ -7,8 +7,9 @@
 //     Module Name: dff
 //     Description: 32 bit D flip flop
 //
-// Revision: 1.1
+// Revision: 1.2
 // 1.1 - Changed parameters to fit 16-bit computer
+// 1.2 - Made dff default to 0 on startup
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef DFF
@@ -28,6 +29,12 @@ module dff
     //
     // ---------------- MODULE DESIGN IMPLEMENTATION ----------------
     //
+
+    //start on 0
+    initial begin
+	Q <= 0;
+    end
+
     always @(posedge CLOCK, posedge RESET)
     begin
         if (RESET)
