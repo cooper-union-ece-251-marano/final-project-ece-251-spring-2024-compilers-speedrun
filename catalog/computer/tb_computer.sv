@@ -7,8 +7,9 @@
 //     Module Name: tb_computer
 //     Description: Test bench for a single-cycle MIPS computer
 //
-// Revision: 1.1
+// Revision: 1.2
 // 1.1 - Tweaked to fit 16 bit computer
+// 1.2 - Changed stop condition to stop on no-op
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TB_COMPUTER
@@ -52,7 +53,6 @@ module tb_computer;
   // initialize test
   initial begin
     #0 clk_enable <= 0; #50 reset <= 1; # 50; reset <= 0; #50 clk_enable <= 1;
-    #100 $finish;
   end
 
   // monitor what happens at posedge of clock transition
@@ -123,6 +123,12 @@ module tb_computer;
     $display("\t-regfile -- wd = 0x%4h",dut.mips.dp.rf.wd);
     $display("\t-regfile -- rd1 = 0x%4h",dut.mips.dp.rf.rd1);
     $display("\t-regfile -- rd2 = 0x%4h",dut.mips.dp.rf.rd2);
+  end
+  
+  always @(negedge clk or posedge clk) begin
+    if (dut.instr == 0) begin
+      $finish;
+    end
   end
 
 endmodule
