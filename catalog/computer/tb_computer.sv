@@ -7,9 +7,10 @@
 //     Module Name: tb_computer
 //     Description: Test bench for a single-cycle MIPS computer
 //
-// Revision: 1.2
+// Revision: 1.3
 // 1.1 - Tweaked to fit 16 bit computer
 // 1.2 - Changed stop condition to stop on no-op
+// 1.3 - Accidentally typoed the dumpfile command contents
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TB_COMPUTER
@@ -42,7 +43,7 @@ module tb_computer;
 
 
   initial begin
-    $dumpfile("tb_computer.vcd");
+    $dumpfile("computer.vcd");
     $dumpvars(0, dut, dut1);
     $monitor("t=%t\twrite=0x%4h\taluout=0x%4h\t",$realtime,writedata,dataadr);
     // $dumpvars(0,clk,a,b,ctrl,result,zero,negative,carryOut,overflow);

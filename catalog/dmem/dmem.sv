@@ -7,8 +7,9 @@
 //     Module Name: dmem
 //     Description: 16-bit RISC memory ("data" segment)
 //
-// Revision: 1.1
+// Revision: 1.2
 // 1.1 - Changed parameters to fit 16-bit computer
+// 1.2 - Incresed the size of the data memory
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef DMEM
@@ -18,7 +19,7 @@
 
 module dmem
 // n=bit length of register; r=bit length of addr to limit memory and not crash your verilog emulator
-    #(parameter n = 16, parameter r = 8)(
+    #(parameter n = 16, parameter r = 12)(
     //
     // ---------------- PORT DEFINITIONS ----------------
     //
