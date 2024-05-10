@@ -30,9 +30,9 @@ In order to save the results of a program, multiple different forms of registers
 
 The program counter is a set of D flip-flops that stores what instruction address the program is currently on. The value stored within the program counter can thne be fed to the instruction memory registers to output whatever instruction that needs to be decoded. Updating the value of the program counter is also how the CPU progresses through a program. Usually the value of the program counter is incremented by one, but branch and jump instructions can change what value is loaded into the program counter to change the flow of the program.
 
-### Control Unit/Multiplexors
+### Control Unit/multiplexers
 
-Because multiple potential inputs may feed into a single port or pathway to accommodate the different instruction types, a control unit and multiplexors are needed in order to select the right signal/input to pass into certain paths/ports. (add more later)
+Because multiple potential inputs may feed into a single port or pathway to accommodate the different instruction types, a control unit and multiplexers are needed in order to select the right signal/input to pass into certain paths/ports. (add more later)
 
 ## Instruction Set Architecture
 
