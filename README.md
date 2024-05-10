@@ -1,447 +1,126 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/pelSJLGu)
-# Catalog of Verilog Components to Build and Simulate a MIPS-based RISC.
-
-This work is based off the MIPS Verilog code by [Harris and Harris](https://pages.hmc.edu/harris/ddca/ddca2e.html)
-
-The basis of the single cycle computer as provided by these Verilog components:
-
-```verilog
-// mips.sv
-// From Section 7.6 of Digital Design & Computer Architecture
-// Updated to SystemVerilog 26 July 2011 David_Harris@hmc.edu
-`timescale 1ms/100us // 1ms period, 100us precision
-
-module mips_single_cycle_tb();
-
-  logic        clk;
-  logic        reset;
-
-  logic [31:0] writedata, dataadr;
-  logic        memwrite;
-
-  logic firstTest, secondTest;
-
-  // instantiate device to be tested
-  top dut(clk, reset, writedata, dataadr, memwrite);
-
-  initial
-  begin
-      firstTest = 1'b0;
-      secondTest = 1'b0;
-      $dumpfile("mips_single_cycle_test.vcd");
-      $dumpvars(0,clk,reset,writedata,dataadr,memwrite);
-      // $display("writedata\tdataadr\tmemwrite");
-      $monitor("0x%7h\t%7d\t%8d",writedata,dataadr,memwrite);
-      // $dumpvars(0,clk,a,b,ctrl,result,zero,negative,carryOut,overflow);
-      // $display("Ctl Z  N  O  C  A                    B                    ALUresult");
-      // $monitor("%3b %b  %b  %b  %b  %8b (0x%2h;%3d)  %8b (0x%2h;%3d)  %8b (0x%2h;%3d)",ctrl,zero,negative,overflow,carryOut,a,a,a,b,b,b,result,result,result);
-  end
-
-  // initialize test
-  initial
-    begin
-      reset <= 1; # 22; reset <= 0;
-    end
-
-  // generate clock to sequence tests
-  always
-    begin
-      clk <= 1; # 5; clk <= 0; # 5;
-    end
-
-  always @(posedge clk)
-  begin
-      $display("+");
-      $display("\t+instr = 0x%8h",dut.instr);
-      $display("\t+op = 0b%6b",dut.mips.c.op);
-      $display("\t+controls = 0b%9b",dut.mips.c.md.controls);
-      $display("\t+funct = 0b%6b",dut.mips.c.ad.funct);
-      $display("\t+aluop = 0b%2b",dut.mips.c.ad.aluop);
-      $display("\t+alucontrol = 0b%3b",dut.mips.c.ad.alucontrol);
-      $display("\t+alu result = 0x%8h",dut.mips.dp.alu.result);
-      $display("\t+HiLo = 0x%8h",dut.mips.dp.alu.HiLo);
-      $display("\t+$v0 = 0x%4h",dut.mips.dp.rf.rf[2]);
-      $display("\t+$v1 = 0x%4h",dut.mips.dp.rf.rf[3]);
-      $display("\t+$a0 = 0x%4h",dut.mips.dp.rf.rf[4]);
-      $display("\t+$a1 = 0x%4h",dut.mips.dp.rf.rf[5]);
-      $display("\t+$t0 = 0x%4h",dut.mips.dp.rf.rf[8]);
-      $display("\t+$t1 = 0x%4h",dut.mips.dp.rf.rf[9]);
-      $display("\t+regfile -- ra1 = %d",dut.mips.dp.rf.ra1);
-      $display("\t+regfile -- ra2 = %d",dut.mips.dp.rf.ra2);
-      $display("\t+regfile -- we3 = %d",dut.mips.dp.rf.we3);
-      $display("\t+regfile -- wa3 = %d",dut.mips.dp.rf.wa3);
-      $display("\t+regfile -- wd3 = %d",dut.mips.dp.rf.wd3);
-      $display("\t+regfile -- rd1 = %d",dut.mips.dp.rf.rd1);
-      $display("\t+regfile -- rd2 = %d",dut.mips.dp.rf.rd2);
-      $display("\t+RAM[%4d] = %4d",dut.dmem.a,dut.dmem.rd);
-      $display("writedata\tdataadr\tmemwrite");
-  end
-
-  // check results
-  always @(negedge clk)
-    begin
-      $display("-");
-      $display("\t-instr = 0x%8h",dut.instr);
-      $display("\t-op = 0b%6b",dut.mips.c.op);
-      $display("\t-controls = 0b%9b",dut.mips.c.md.controls);
-      $display("\t-funct = 0b%6b",dut.mips.c.ad.funct);
-      $display("\t-aluop = 0b%2b",dut.mips.c.ad.aluop);
-      $display("\t-alucontrol = 0b%3b",dut.mips.c.ad.alucontrol);
-      $display("\t-alu result = 0x%8h",dut.mips.dp.alu.result);
-      $display("\t-HiLo = 0x%8h",dut.mips.dp.alu.HiLo);
-      $display("\t-$v0 = 0x%4h",dut.mips.dp.rf.rf[2]);
-      $display("\t-$v1 = 0x%4h",dut.mips.dp.rf.rf[3]);
-      $display("\t-$a0 = 0x%4h",dut.mips.dp.rf.rf[4]);
-      $display("\t-$a1 = 0x%4h",dut.mips.dp.rf.rf[5]);
-      $display("\t-$t0 = 0x%4h",dut.mips.dp.rf.rf[8]);
-      $display("\t-$t1 = 0x%4h",dut.mips.dp.rf.rf[9]);
-      $display("\t-regfile -- ra1 = %d",dut.mips.dp.rf.ra1);
-      $display("\t-regfile -- ra2 = %d",dut.mips.dp.rf.ra2);
-      $display("\t-regfile -- we3 = %d",dut.mips.dp.rf.we3);
-      $display("\t-regfile -- wa3 = %d",dut.mips.dp.rf.wa3);
-      $display("\t-regfile -- wd3 = %d",dut.mips.dp.rf.wd3);
-      $display("\t-regfile -- rd1 = %d",dut.mips.dp.rf.rd1);
-      $display("\t-regfile -- rd2 = %d",dut.mips.dp.rf.rd2);
-      $display("\t+RAM[%4d] = %4d",dut.dmem.a,dut.dmem.rd);
-      $display("writedata\tdataadr\tmemwrite");
-      if (dut.dmem.RAM[84] === 32'h9504)
-        begin
-          $display("Successfully wrote 0x%4h at RAM[%3d]",84,32'h9504);
-          firstTest = 1'b1;
-        end
-      if (dut.dmem.RAM[88] === 0)
-        begin
-          $display("Successfully wrote 0x%4h at RAM[%3d]",88,0);
-          secondTest = 1'b1;
-        end
-      if(memwrite) begin
-        if(dataadr === 84 & writedata === 32'h9504)
-        begin
-          $display("Successfully wrote 0x%4h at RAM[%3d]",writedata,dataadr);
-          firstTest = 1'b1;
-        end
-        if(dataadr === 88 & writedata === 0)
-        begin
-          $display("Successfully wrote 0x%4h at RAM[%3d]",writedata,dataadr);
-          secondTest = 1'b1;
-        //if(dataadr === 60 & writedata === 28) begin
-            // $display("Simulation succeeded");
-            // $finish;
-          // end
-        end
-        // else if (dataadr !== 80) begin
-        //   $display("Simulation failed");
-        //   $finish;
-        // end
-      end
-      if (firstTest === 1'b1 & secondTest === 1'b1)
-      begin
-          $display("Program successfully completed");
-          $finish;
-      end
-      // else
-      // begin
-      //     $display("Program UNsuccessfully completed");
-      //     $finish;
-      // end
-    end
-endmodule
-
-module top(input  logic        clk, reset,
-           output logic [31:0] writedata, dataadr,
-           output logic        memwrite);
-
-  logic [31:0] pc, instr, readdata;
-
-  // instantiate processor and memories
-  mips mips(clk, reset, pc, instr, memwrite, dataadr,
-            writedata, readdata);
-  imem imem(pc[7:2], instr);
-  dmem dmem(clk, memwrite, dataadr, writedata, readdata);
-endmodule
-
-module dmem(input  logic        clk, we,
-            input  logic [31:0] a, wd,
-            output logic [31:0] rd);
-
-  logic [31:0] RAM[0:63];
-
-  assign rd = RAM[a[31:2]]; // word aligned
-
-  always @(posedge clk)
-    if (we) RAM[a[31:2]] <= wd;
-endmodule
-
-module imem(input  logic [5:0] a,
-            output logic [31:0] rd);
-
-  logic [31:0] RAM[0:63];
-
-  initial
-    begin
-      // read memory in hex format from file
-      $readmemh("memfile.dat",RAM);
-    end
-
-  assign rd = RAM[a]; // word aligned
-endmodule
-
-module mips(input  logic        clk, reset,
-            output logic [31:0] pc,
-            input  logic [31:0] instr,
-            output logic        memwrite,
-            output logic [31:0] aluout, writedata,
-            input  logic [31:0] readdata);
-
-  logic       memtoreg, alusrc, regdst,
-              regwrite, jump, pcsrc, zero;
-  logic [2:0] alucontrol;
-
-  controller c(instr[31:26], instr[5:0], zero,
-               memtoreg, memwrite, pcsrc,
-               alusrc, regdst, regwrite, jump,
-               alucontrol);
-  datapath dp(clk, reset, memtoreg, pcsrc,
-              alusrc, regdst, regwrite, jump,
-              alucontrol,
-              zero, pc, instr,
-              aluout, writedata, readdata);
-endmodule
-
-module controller(input  logic [5:0] op, funct,
-                  input  logic       zero,
-                  output logic       memtoreg, memwrite,
-                  output logic       pcsrc, alusrc,
-                  output logic       regdst, regwrite,
-                  output logic       jump,
-                  output logic [2:0] alucontrol);
-
-  logic [1:0] aluop;
-  logic       branch;
-
-  maindec md(op, memtoreg, memwrite, branch,
-             alusrc, regdst, regwrite, jump, aluop);
-  aludec  ad(funct, aluop, alucontrol);
-
-  assign pcsrc = branch & zero;
-endmodule
-
-module maindec(input  logic [5:0] op,
-               output logic       memtoreg, memwrite,
-               output logic       branch, alusrc,
-               output logic       regdst, regwrite,
-               output logic       jump,
-               output logic [1:0] aluop);
-
-  logic [8:0] controls;
-
-  assign {regwrite, regdst, alusrc, branch, memwrite,
-          memtoreg, jump, aluop} = controls; // controls has 9 logical signals
-
-  always @*
-    case(op)
-      6'b000000: controls <= 9'b110000010; // RTYPE
-      6'b100011: controls <= 9'b101001000; // LW
-      6'b101011: controls <= 9'b001010000; // SW
-      6'b000100: controls <= 9'b000100001; // BEQ
-      6'b001000: controls <= 9'b101000000; // ADDI
-      6'b000010: controls <= 9'b000000100; // J
-      default:   controls <= 9'bxxxxxxxxx; // illegal op
-    endcase
-endmodule
-
-module aludec(input  logic [5:0] funct,
-              input  logic [1:0] aluop,
-              output logic [2:0] alucontrol);
-
-  always @*
-    case(aluop)
-      2'b00: alucontrol <= 3'b010;  // add (for lw/sw/addi)
-      2'b01: alucontrol <= 3'b110;  // sub (for beq)
-      default: case(funct)          // R-type instructions]
-          6'b100000: alucontrol <= 3'b010; // add
-          6'b100010: alucontrol <= 3'b110; // sub
-          6'b100100: alucontrol <= 3'b000; // and
-          6'b100101: alucontrol <= 3'b001; // or
-          6'b101010: alucontrol <= 3'b111; // slt
-          6'b011000: alucontrol <= 3'b011; // mult
-          6'b010010: alucontrol <= 3'b100; // mflo
-          6'b010000: alucontrol <= 3'b101; // mfhi
-          default:   alucontrol <= 3'bxxx; // ???
-        endcase
-    endcase
-endmodule
-
-//
-// 000
-// 001
-// 010
-// 011 - available - use for mult
-// 100 - available - use for mfhi
-// 101 - available - use for mflo
-// 110
-// 111
-
-module datapath(input  logic        clk, reset,
-                input  logic        memtoreg, pcsrc,
-                input  logic        alusrc, regdst,
-                input  logic        regwrite, jump,
-                input  logic [2:0]  alucontrol,
-                output logic        zero,
-                output logic [31:0] pc,
-                input  logic [31:0] instr,
-                output logic [31:0] aluout, writedata,
-                input  logic [31:0] readdata);
-
-  logic [4:0]  writereg;
-  logic [31:0] pcnext, pcnextbr, pcplus4, pcbranch;
-  logic [31:0] signimm, signimmsh;
-  logic [31:0] srca, srcb;
-  logic [31:0] result;
-
-  // next PC logic
-  flopr #(32) pcreg(clk, reset, pcnext, pc);
-  adder       pcadd1(pc, 32'b100, pcplus4);
-  sl2         immsh(signimm, signimmsh);
-  adder       pcadd2(pcplus4, signimmsh, pcbranch);
-  mux2 #(32)  pcbrmux(pcplus4, pcbranch, pcsrc, pcnextbr);
-  mux2 #(32)  pcmux(pcnextbr, {pcplus4[31:28], instr[25:0], 2'b00}, jump, pcnext);
-
-  // register file logic
-  regfile     rf(clk, regwrite, instr[25:21], instr[20:16],
-                 writereg, result, srca, writedata);
-  mux2 #(5)   wrmux(instr[20:16], instr[15:11],
-                    regdst, writereg);
-  mux2 #(32)  resmux(aluout, readdata, memtoreg, result);
-  signext     se(instr[15:0], signimm);
-
-  // ALU logic
-  mux2 #(32)  srcbmux(writedata, signimm, alusrc, srcb);
-  alu         alu(clk, srca, srcb, alucontrol, aluout, zero);
-endmodule
-
-module regfile(input  logic        clk,
-               input  logic        we3,
-               input  logic [4:0]  ra1, ra2, wa3,
-               input  logic [31:0] wd3,
-               output logic [31:0] rd1, rd2);
-
-  logic [31:0] rf[31:0];
-
-  // three ported register file
-  // read two ports combinationally
-  // write third port on rising edge of clk
-  // register 0 hardwired to 0
-  // note: for pipelined processor, write third port
-  // on falling edge of clk
-
-  always @(posedge clk)
-    if (we3) rf[wa3] <= wd3;
-
-  assign rd1 = (ra1 != 0) ? rf[ra1] : 0;
-  assign rd2 = (ra2 != 0) ? rf[ra2] : 0;
-endmodule
-
-module adder(input  logic [31:0] a, b,
-             output logic [31:0] y);
-
-  assign y = a + b;
-endmodule
-
-module sl2(input  logic [31:0] a,
-           output logic [31:0] y);
-
-  // shift left by 2
-  assign y = {a[29:0], 2'b00};
-endmodule
-
-module signext(input  logic [15:0] a,
-               output logic [31:0] y);
-
-  assign y = {{16{a[15]}}, a};
-endmodule
-
-module flopr #(parameter WIDTH = 8)
-              (input  logic             clk, reset,
-               input  logic [WIDTH-1:0] d,
-               output logic [WIDTH-1:0] q);
-
-  always @(posedge clk, posedge reset)
-    if (reset) q <= 0;
-    else       q <= d;
-endmodule
-
-module mux2 #(parameter WIDTH = 8)
-             (input  logic [WIDTH-1:0] d0, d1,
-              input  logic             s,
-              output logic [WIDTH-1:0] y);
-
-  assign y = s ? d1 : d0;
-endmodule
-
-module alu(input  logic clk,
-           input  logic [31:0] a, b,
-           input  logic [2:0]  alucontrol,
-           output logic [31:0] result,
-           output logic        zero);
-
-  logic [31:0] condinvb, sum;
-  logic [63:0] HiLo;
-
-  assign zero = (result == 32'b0);
-  assign condinvb = alucontrol[2] ? ~b : b;
-  assign sumSlt = a + condinvb + alucontrol[2];
-
-	initial
-		begin
-			HiLo = 64'b0;
-		end
-
-  always @(a,b,alucontrol)
-    begin
-      case (alucontrol)
-        3'b000: result = a & b; // and
-        3'b001: result = a | b; // or
-        3'b010: result = a + b; // add
-        3'b100: result = HiLo[31:0]; // MFLO
-        3'b101: result = HiLo[63:32]; // MFHI
-        3'b110: result = sumSlt; // sub
-        3'b111: result = sumSlt[31]; // slt
-      endcase
-    end
-
-    // case (alucontrol[1:0])
-    //   2'b00: result = a & b;
-    //   2'b01: result = a | b;
-    //   2'b10: result = sum;
-    //   2'b11: result = sum[31];
-    // endcase
-
-	// always @(posedge clk)
-	// 	begin
-  //     case (alucontrol)
-  //       3'b000: result = a & b; // and
-  //       3'b001: result = a | b; // or
-  //       3'b010: result = a + b; // add
-  //       3'b100: result = HiLo[31:0]; // MFLO
-  //       3'b101: result = HiLo[63:32]; // MFHI
-  //       3'b110: result = sumSlt; // sub
-  //       3'b111: result = sum[31]; // slt
-  //     endcase
-  //   end
-
-	//Multiply and divide results are only stored at clock falling edge.
-	always @(negedge clk)
-		begin
-      case (alucontrol)
-        3'b011: HiLo = a * b; // mult
-        3'b101: // div
-          begin
-            HiLo[31:0] = a / b;
-            HiLo[63:32] = a % b;
-          end
-      endcase
-		end
-endmodule
-
-```
+# 16-bit Verilog CPU by Jason Hao and Daniel Park
+
+This file contains the documentation and details for the CPU Final Project for ECE251. The "green card", CPU diagram, and a timing diagram for various instructions are provided as images in the same directory.
+
+## Overall Design
+
+The CPU implemented here is a 16-bit RISC single-cycle processor, which means that for every clock cycle one instruction is processed at a time. The bit-width of the operands and registers are all 16 bits long, which allows for convenient instruction formatting and a compact design so that the CPU can be simulated smoothly on most computers. The CPU is modelled after the 32-bit MIPS CPU presented in the textbook, but some tweaks were made for our specific CPU. For example, the CPU is word-addressable instead of byte-addressable as the instructions we had did not provide much use for specifically using a byte-addressable scheme. Even so, the basic stages of an instruction and the overall design are similar to the original CPU in the textbook.
+
+## Modules in CPU
+
+The CPU is comprised of multiple modules that simulate the digital logic to physically implement the CPU. This includes a clock, memory registers, ALUs for computation, and more.
+
+### Clock
+
+The clock module is what allows the CPU to run at all because it provides a steady signal that indicates when the registers should update their contents. The clock simply toggles between a high and low signal at a given rate/period and outputs this toggling signal. The clock is then connected to all of the memory modules so that the registers all synchronously update their contents to progress through a program.
+
+### Arithmetic Logic Unit
+
+The ALU performs all of the calculations that are needed by the instructions in the program running. The ALU takes in 2 16-bit operands and an opcode as inputs and outputs the result of the calculation and a zero bit. The ALU opcode is 3 bits long, which allows for 8 possible operations to be implemented for the ALU. The operations include adding, subtracting, and logical operations. The result of the operation is then outputed to be stored in a register. The zero bit also is high when the result is exactly 16 zeroes, and this allows the branch operations to be implemented with some additional logic.
+
+### Sign Extenders
+
+Sometimes, only parts of the instruction bits are used for a computation. However, the adders and ALU only take 16-bit operands and the size of the parts of the instruction is not compatible with the modules. As a result, sign extenders were implemented to allow the instruction portions to be the right size. The sign extenders used in the CPU allow the immediate fields of instructions to be extended to 16 bits so that they can be used in future computations. By copying the contents of the most significant bit into the extended bits, the sign extenders also preserve the sign of the immediate to allow for signed operations.
+
+### Memory Registers
+
+In order to save the results of a program, multiple different forms of registers are used to store data and keep track of where the program is.  
+
+The register file holds 16 registers, each with 16 bits, that can be used as inputs or outputs for instructions to use. The register file has 2 read address ports, a write address port, 2 read data ports, and a write data port. The read address ports can take a register address and displays it on the corresponding read data port. Similarly, the write address port specifies which register should write whatever data is being inputted into the write data port.
+
+The program counter is a set of D flip-flops that stores what instruction address the program is currently on. The value stored within the program counter can thne be fed to the instruction memory registers to output whatever instruction that needs to be decoded. Updating the value of the program counter is also how the CPU progresses through a program. Usually the value of the program counter is incremented by one, but branch and jump instructions can change what value is loaded into the program counter to change the flow of the program.
+
+The instruction memory holds all of the instructions in the program currently running. The instruction is displayed using the value from the program counter which is then decoded by other modules into portions that can be used as immediates, register addresses, or opcodes later. For this CPU, the instruction memory is a read-only memory over the course of a program's execution.
+
+The data memory holds any data that cannot fit within the 16 registers provided by the register file. The data memory contains an address port, a read data port, and a write data port. When an address is inputted into the address port, the read data port will read whatever is in the data memory at that address, and the data memory will update the address with whatever data is in the write data port when prompted.
+
+### Control Unit/Multiplexers
+
+Because multiple potential inputs may feed into a single port or pathway to accommodate the different instruction types, a control unit and multiplexers are needed in order to select the right signal/input to pass into certain paths/ports. The control unit itself takes in the opcode field of the instruction (as the control bits only depend on the type of instruction it is performing) and translates the opcode into many different signals that signify which input should pass through the multiplexers in the CPU.
+
+The multiplexers are components that receive two signals and uses a selection bit to decide which signal should be outputed. This is to prevent two signals from colliding and creating a short circuit on an actual physical implementation as well as to avoid unpredictable consequences from merging two signals together. The select bits are provided by the control unit after it has translated the opcode into the appropriate signals for each multiplexer.
+
+## Instruction Set Architecture
+
+The CPU is designed to allow a certain set of instructions to be able to be executed on the given modules. The instruction set is a 16-bit RISC based instruction set which means that there is a small number of instructions available, each of them being 16 bits long. This CPU's instruction set allows for basic computations such as addition, subtraction, and logical operations to be performed.
+
+### Instruction Formats
+
+The instruction set architecture supports 3 types of instruction formats, an R-type, an I-type, and a J-type. Each of the bit fields for each of the instructions are either 4 or 8 bits long, which conveniently fits within a 16-bit address.
+
+R-type instructions are used for instructions that require two registers as inputs that would be written onto another register. This includes most of the instructions that have an operation hardcoded onto the ALU such as the logical operations AND, OR, NOT, and XOR, and addition.The R-type format contains a 4-bit field for an opcode, and 3 4-bit register fields (2 for input, 1 for output).
+
+I-type instructions allow for an immediate value to be used to calculate the results of a computation. This allows a wide variety of instructions to use the format, including the two branch instructions, the store/load word instructions, and immediate versions of some R-type instructions. The I-type format uses a 4-bit field for an opcode, 2 4-bit register fields, and a 4-bit immediate field.
+
+The J-type format is exclusively used for the jump instruction as the name suggests. The J-type format allows for one 4-bit field for the opcode, one 4-bit register field, and one 8-bit immediate field. This is to allow the jump instruction to have a wider range of available jumping distance as the immediate is added to the register to give an address to jump to.
+
+### Instruction Implementation
+
+Most of the R-type instructions had their operations hardcoded directly into the ALU, so the ALU opcode was directly taken from the last three bits of the instruction opcode. The register addresses were also simply put directly into the appropriate register file ports.
+
+The shft and addi instructions also had their operations hardcoded, so their implementation was similar to that of the the R-type instructions. The only difference, was the write address input and the immediate value being inputted into the ALU.
+
+The branch instructions used subtraction to determine whether or not two registers were equal or not (i.e. whether the zero bit was high or low). If the zero bit was in the correct state for the instruction, then the offset in the instruction would be added to the next PC input. Otherwise, the instruction effectively does nothing.
+
+The jump instruction calculates an address to jump to by adding the immediate and register provided in the instruction. This would then overwrite the usual next PC input. This implementation allows for the usually j, jal, and jr instructions from the MIPS instruction set to be implemented in a limited scope. The $zero register can be added to an immediate value to act as a j instruction, or a register can act as the usual $ra register and the immediate field be 0 so that the jump instruction can turn into a jal and jr instruction.
+
+The store and load word instructions use addition to calculate the correct offset from a register needed for the data memory. Then, the other register acts as either the write address input of the register file or the write data input of the data memory.
+
+### Instruction Table
+
+|OpCode|Instruction|Type|Description|
+|------|-----------|----|---|
+|0000  |shft       |I   |Shift logical left Operation|
+|0001  |addi       |I   |Adds an immediate to a register|
+|0010  |sw         |I   |Stores the contents of a register into data memory|
+|0011  |lw         |I   |Loads data from data memory into a register|
+|0100  |beq        |I   |Branches when two registers are equal|
+|0101  |bne        |I   |Branches when two registers are not equal|
+|0110  |jump       |J   |Jumps to a specified address|
+|1000  |and        |R   |Logical AND Operation|
+|1001  |or         |R   |Logical OR Operation|
+|1010  |not        |R   |Logical NOT Operation|
+|1011  |xor        |R   |Logical XOR Operation|
+|1100  |sub        |R   |Subtracts a register from another|
+|1101  |add        |R   |Adds two registers together|
+|1110  |slt        |R   |Sets a register to 1 or 0 depending on if one register is less than another|
+
+## Registers
+
+Each of the 16 registers in the register file is designated a specific purpose that the programmer can use for their programs. For example, the 0th register in the register file is hardwired to always contain the constant zero for ease of use. The registers are also assigned a name for use in writing the assembly code and a number for translating the assembly code into machine code.
+
+### Register Table
+
+|Name  |Number|Use                |
+|------|------|-------------------|
+|$zero |0     |Constant Zero      |
+|$sp   |1     |Stack Pointer      |
+|$at   |2     |Assembler Temporary|
+|$va   |3     |Return Value       |
+|$a0-a1|4-5   |Arguments          |
+|$t0-t5|6-11  |Temporaries        |
+|$s0-s3|12-15 |Saved Temporaries  |
+
+## How to Run Programs
+
+The process of running a program in the CPU is similar for both the pre-prepared programs and any custom programs. Along with the CPU, three pre-prepared programs are provided for an example of a program written in machine code and asssembly language. These instructions assume that the github repository has been cloned onto your computer beforehand.
+
+### Prepared programs
+
+1. Rename the desired program to "prog_exe" because the instruction memory reads out of the file named "prog_exe".
+
+2. Type "make" into the terminal to compile the program.
+
+3. Type "make simulate" to display the results of the program.
+
+### Custom programs
+
+1. (Optional) Write the custom program using the instruction set architecture that the CPU uses.
+
+2. Translate the program into machine code using hexadecimal with one instruction per line. Make sure that the file is exactly 64 lines longand that there is a 0000 inserted at the end of the program (this effectively acts as a halt command for the CPU).
+
+3. Follow steps 1-3 of the pre-prepared program instructions for the machine code file you made.
+
+### Outputs
+
+There is no output or display instruction included with the instruction set. So, the contents of the register file, the program counter, the instruction, and other important signals are printed on every positive and negative clock edge. In order to view the output of a program, the result should be put in a register in the register file so that it is printed out at the end of execution.
