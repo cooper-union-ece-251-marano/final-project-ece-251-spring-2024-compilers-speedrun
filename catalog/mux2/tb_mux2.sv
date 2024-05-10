@@ -7,7 +7,8 @@
 //     Module Name: tb_mux2
 //     Description: Test bench for 2 to 1 multiplexer
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Changed parameters and added some more test inputs
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TB_MUX2
@@ -18,7 +19,7 @@
 `include "../clock/clock.sv"
 
 module tb_mux2;
-    parameter n = 32; // #bits for an operand
+    parameter n = 16; // #bits for an operand
     logic s;
     logic [(n-1):0] d0, d1;
     logic [(n-1):0] y;
@@ -34,12 +35,16 @@ module tb_mux2;
     end
 
     initial begin
-        d0 <= #n'h80000000;
-        d1 <= #n'h00000001;
+        d0 <= #n'h8000;
+        d1 <= #n'h0001;
         enable <= 0;
         #10 enable <= 1;
         #10 s <= 1'b0;
+	#10 d0 <= #n'h234f;
+	#10 d1 <= #n'hfeac;
         #20 s <= 1'b1;
+	#10 d0 <= #n'h0101;
+	#10 d1 <= #n'h3456;
         #100 enable <= 0;
         $finish;
     end

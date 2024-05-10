@@ -7,7 +7,8 @@
 //     Module Name: tb_dmem
 //     Description: Test bench for data memory
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Changed parameters and added more inputs
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TB_DMEM
@@ -18,8 +19,8 @@
 `include "../clock/clock.sv"
 
 module tb_dmem;
-    parameter n = 32; // bit length of registers/memory
-    parameter r = 6; // we are only addressing 64=2**6 mem slots in imem
+    parameter n = 16; // bit length of registers/memory
+    parameter r = 8; // we are only addressing 64=2**6 mem slots in imem
     logic [(n-1):0] readdata, writedata;
     logic [(n-1):0] dmem_addr;
     logic write_enable;
@@ -34,16 +35,16 @@ module tb_dmem;
 
     initial begin
         #10 clock_enable <= 1;
-        #20 writedata = #(n)'hFFFFFFFF;
-        #20 dmem_addr <= #(r)'b000000;
+        #20 writedata = #(n)'hFFFF;
+        #20 dmem_addr <= #(r)'b00000000;
         #20 write_enable <= 1;
         #20 write_enable <= 0;
-        #20 dmem_addr <= #(r)'b000001;
-        #20 writedata = #(n)'h0000FFFF;
+        #20 dmem_addr <= #(r)'b00000001;
+        #20 writedata = #(n)'h00FF;
         #20 write_enable <= 1;
         #20 write_enable <= 0;
-        #20 dmem_addr <= #(r)'b000010;
-        #20 writedata = #(n)'h00000000;
+        #20 dmem_addr <= #(r)'b00000010;
+        #20 writedata = #(n)'h0000;
         #20 write_enable <= 1;
         #20 write_enable <= 0;
         #20 $finish;

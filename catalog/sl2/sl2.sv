@@ -7,7 +7,8 @@
 //     Module Name: sl2
 //     Description: shift left by 2 (multiply by 4)
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Changed parameter to fit 16-bit computer
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef SL2
@@ -16,7 +17,7 @@
 `timescale 1ns/100ps
 
 module sl2
-    #(parameter n = 32)(
+    #(parameter n = 16)(
     //
     // ---------------- PORT DEFINITIONS ----------------
     //
@@ -27,6 +28,7 @@ module sl2
     // ---------------- MODULE DESIGN IMPLEMENTATION ----------------
     //
     assign Y = {A[(n-3):0], 2'b00};
+    //also going with word addressing, so shift left 2 probably not needed
 endmodule
 
 `endif // SL2

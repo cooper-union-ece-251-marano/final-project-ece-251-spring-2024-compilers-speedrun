@@ -7,7 +7,8 @@
 //     Module Name: tb_signext
 //     Description: Test bench for sign extender
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Changed parameters and added multiple test inputs
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef TB_SIGNEXT
@@ -17,8 +18,8 @@
 `include "signext.sv"
 
 module tb_sl2;
-    parameter n = 32; // #bits for an operand
-    parameter i = n/2; // #bits for an immediate
+    parameter n = 16; // #bits for an operand
+    parameter i = n/4; // #bits for an immediate
     logic [(i-1):0] a;
     logic [(n-1):0] y;
 
@@ -30,7 +31,22 @@ module tb_sl2;
     end
 
     initial begin
-        a <= #i'h8000;
+        a <= #i'b0000;
+	#10 a <= #i'b0001;
+	#10 a <= #i'b0010;
+	#10 a <= #i'b0011;
+	#10 a <= #i'b0100;
+	#10 a <= #i'b0101;
+	#10 a <= #i'b0110;
+	#10 a <= #i'b0111;
+	#10 a <= #i'b1000;
+	#10 a <= #i'b1001;
+	#10 a <= #i'b1010;
+	#10 a <= #i'b1011;
+	#10 a <= #i'b1100;
+	#10 a <= #i'b1101;
+	#10 a <= #i'b1110;
+	#10 a <= #i'b1111;
     end
 
     signext uut(

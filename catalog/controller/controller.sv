@@ -5,9 +5,10 @@
 // 
 //     Create Date: 2023-02-07
 //     Module Name: controller
-//     Description: 32-bit RISC-based CPU controller (MIPS)
+//     Description: 16-bit RISC-based CPU controller (MIPS)
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Changed to fit the control variables in our CPU
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef CONTROLLER
@@ -19,30 +20,25 @@
 `include "../aludec/aludec.sv"
 
 module controller
-    #(parameter n = 32)(
-    //
-    // ---------------- PORT DEFINITIONS ----------------
-    //
-    input  logic [5:0] op, funct,
+    (
+    input  logic [3:0] op,
     input  logic       zero,
-    output logic       memtoreg, memwrite,
-    output logic       pcsrc, alusrc,
-    output logic       regdst, regwrite,
-    output logic       jump,
-    output logic [2:0] alucontrol
+    output logic       memtoreg, regwrite, memwrite,
+    output logic       branch, jump, alusrc,
+    output logic       regsrc, shortlong,
+    output logic [2:0] aluop
 );
     //
     // ---------------- MODULE DESIGN IMPLEMENTATION ----------------
     //
-    logic [1:0] aluop;
-    logic       branch;
+    logic       Branch;
     
     // CPU main decoder
-    maindec md(op, memtoreg, memwrite, branch, alusrc, regdst, regwrite, jump, aluop);
+    maindec md(op, memtoreg, regwrite, memwrite, Branch, jump, alusrc, regsrc, shortlong);
     // CPU's ALU decoder
-    aludec  ad(funct, aluop, alucontrol);
+    aludec  ad(op, aluop);
 
-  assign pcsrc = branch & zero;
+  assign branch = Branch & (zero ^ op[0]);
 
 endmodule
 

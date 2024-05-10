@@ -5,9 +5,10 @@
 // 
 //     Create Date: 2023-02-07
 //     Module Name: cpu
-//     Description: 32-bit RISC-based CPU (MIPS)
+//     Description: 16-bit RISC-based CPU (MIPS)
 //
-// Revision: 1.0
+// Revision: 1.1
+// 1.1 - Tweaked to fit 16-bit CPU
 //
 //////////////////////////////////////////////////////////////////////////////////
 `ifndef CPU
@@ -19,7 +20,7 @@
 `include "../datapath/datapath.sv"
 
 module cpu
-    #(parameter n = 32)(
+    #(parameter n = 16)(
     //
     // ---------------- PORT DEFINITIONS ----------------
     //
@@ -35,16 +36,16 @@ module cpu
     //
 
     // cpu internal components
-    logic       memtoreg, alusrc, regdst, regwrite, jump, pcsrc, zero;
+    logic       memtoreg, regwrite, branch, jump, alusrc, regsrc, shortlong, zero;
     logic [2:0] alucontrol;
     
-    controller c(instr[(31):26], instr[5:0], zero,
-                    memtoreg, memwrite, pcsrc,
-                    alusrc, regdst, regwrite, jump,
+    controller c(instr[15:12], zero,
+                    memtoreg, regwrite, memwrite,
+                    branch, jump, alusrc, regsrc, shortlong,
                     alucontrol);
 
-    datapath dp(clk, reset, memtoreg, pcsrc,
-                    alusrc, regdst, regwrite, jump,
+    datapath dp(clk, reset, memtoreg, regwrite,
+                    branch, jump, alusrc, regsrc, shortlong,
                     alucontrol,
                     zero, pc, instr,
                     aluout, writedata, readdata);
